@@ -3,12 +3,6 @@ const express = require("express");
 const app = express();
 app.use(express.json());
 
-function generateId() {
-  const maxId =
-    notes.length > 0 ? Math.max(...notes.map((note) => note.id)) : 0;
-  return maxId + 1;
-}
-
 let notes = [
   {
     id: 1,
@@ -29,6 +23,12 @@ let notes = [
     important: true,
   },
 ];
+
+function generateId() {
+  const maxId =
+    notes.length > 0 ? Math.max(...notes.map((note) => note.id)) : 0;
+  return maxId + 1;
+}
 
 app.get("/", (_req, res) => {
   res.send("<h1>Hello World</h1>");
@@ -55,8 +55,8 @@ app.delete("/api/notes/:id", (req, res) => {
 
 app.post("/api/notes", (req, res) => {
   const body = req.body;
-  if (!body.content) {
-    return res.status(400).json({ error: "content missing" });
+  if (body.content === undefined) {
+    return res.status(400).json({ error: "content is missing" });
   }
   const note = {
     content: body.content,
