@@ -3,6 +3,15 @@ const express = require("express");
 const app = express();
 app.use(express.json());
 
+function reqLogger(req, _res, next) {
+  console.log(`Method: ${req.method}`);
+  console.log(`Path: ${req.path}`);
+  console.log(`Body: ${JSON.stringify(req.body)}`);
+  console.log("---");
+  next();
+}
+app.use(reqLogger);
+
 let notes = [
   {
     id: 1,
@@ -67,6 +76,11 @@ app.post("/api/notes", (req, res) => {
   notes = notes.concat(note);
   res.json(note);
 });
+
+function unknownEndpoint(_req, res) {
+  res.status(404).end();
+}
+app.use(unknownEndpoint);
 
 const PORT = 3001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
