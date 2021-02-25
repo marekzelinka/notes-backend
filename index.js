@@ -50,9 +50,6 @@ app.delete("/api/notes/:id", (req, res, next) => {
 
 app.post("/api/notes", (req, res, next) => {
   const body = req.body;
-  if (body.content === undefined) {
-    return res.status(400).json({ error: "content is missing" });
-  }
   const note = new Note({
     content: body.content,
     important: body.important ?? false,
@@ -88,6 +85,8 @@ function errorHandler(error, _req, res, next) {
   console.error(error.message);
   if (error.name === "CastError") {
     return res.status(400).json({ error: "malformatted id" });
+  } else if (error.name === "ValidationError") {
+    return res.status(400).json({ error: error.message });
   }
   next(error);
 }

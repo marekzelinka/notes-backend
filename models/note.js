@@ -24,9 +24,9 @@ mongoose.set("toJSON", {
 });
 
 const noteSchema = new mongoose.Schema({
-  content: String,
-  date: Date,
-  important: Boolean,
+  content: { type: String, minLength: 5, required: true },
+  date: { type: Date, required: true },
+  important: { type: Boolean, required: true },
 });
 
 const Note = mongoose.model("Note", noteSchema);
