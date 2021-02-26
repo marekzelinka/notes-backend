@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const express = require("express");
 const cors = require("cors");
+require("express-async-errors");
 const { MONGODB_URI } = require("./utils/config");
 const { logInfo, logError } = require("./utils/logger");
 const {

@@ -1,4 +1,9 @@
+const { NODE_ENV } = require("./config");
+
 function logInfo(...params) {
+  if (NODE_ENV === "test") {
+    return;
+  }
   console.log(...params);
 }
 
