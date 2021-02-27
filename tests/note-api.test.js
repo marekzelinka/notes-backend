@@ -1,11 +1,14 @@
 const mongoose = require("mongoose");
 const supertest = require("supertest");
+const bcrypt = require("bcrypt");
 const app = require("../app");
 const Note = require("../models/note");
+const User = require("../models/user");
 const {
   initialNotes,
   getNonExistingNoteId,
   getAllNotes,
+  getAllUsers,
 } = require("./test-helper");
 
 const api = supertest(app);
@@ -95,6 +98,60 @@ describe("deletion of a note", () => {
     expect(notesAtEnd).toHaveLength(initialNotes.length - 1);
     const contents = notesAtEnd.map((note) => note.content);
     expect(contents).not.toContain(noteToDelete.content);
+  });
+});
+
+describe("when there is initially one user in db", () => {
+  beforeEach(async () => {
+    await User.deleteMany();
+    const passwordHash = await bcrypt.hash("sekret", 10);
+    const user = new User({ username: "root", passwordHash });
+    await user.save();
+  });
+
+  test("users are returned as json", async () => {
+    const res = await api.get("/api/users");
+    expect(res.statusCode).toBe(200);
+    expect(res.get("Content-Type")).toMatch(/application\/json/);
+  });
+
+  test("all users are returned", async () => {
+    const usersAtStart = await getAllUsers();
+    const res = await api.get("/api/users");
+    expect(res.body).toHaveLength(usersAtStart.length);
+  });
+
+  describe("addition of a new user", () => {
+    test("succeeds with a fresh username", async () => {
+      const usersAtStart = await getAllUsers();
+      const validUser = {
+        username: "mzelinka",
+        name: "Marek Zelinka",
+        password: "123456",
+      };
+      const res = await api.post("/api/users").send(validUser);
+      expect(res.statusCode).toBe(201);
+      expect(res.get("Content-Type")).toMatch(/application\/json/);
+      const usersAtEnd = await getAllUsers();
+      expect(usersAtEnd).toHaveLength(usersAtStart.length + 1);
+      const usernames = usersAtEnd.map((user) => user.username);
+      expect(usernames).toContain(validUser.username);
+    });
+
+    test("fails with statuscode 400 if username already exists", async () => {
+      const usersAtStart = await getAllUsers();
+      console.log(usersAtStart);
+      const existingUser = usersAtStart[0];
+      const invalidUser = {
+        username: existingUser.username,
+        name: "Marek Zely Zelinka",
+        password: "123456",
+      };
+      const res = await api.post("/api/users").send(invalidUser);
+      expect(res.statusCode).toBe(400);
+      const usersAtEnd = await getAllUsers();
+      expect(usersAtEnd).toHaveLength(usersAtStart.length);
+    });
   });
 });
 

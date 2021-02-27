@@ -10,6 +10,7 @@ const {
   errorHandler,
 } = require("./utils/middleware");
 const notesRouter = require("./controllers/notes");
+const usersRouter = require("./controllers/users");
 
 const app = express();
 
@@ -24,19 +25,12 @@ mongoose
   .then(() => logInfo("connected to MongoDB"))
   .catch((error) => logError("error connecting to MongoDB:", error.message));
 
-mongoose.set("toJSON", {
-  transform(_doc, ret) {
-    ret.id = ret._id.toString();
-    delete ret._id;
-    delete ret.__v;
-  },
-});
-
 app.use(cors());
 app.use(express.static("build"));
 app.use(express.json());
 app.use(requestLogger);
 app.use("/api/notes", notesRouter);
+app.use("/api/users", usersRouter);
 app.use(unknownEndpoint);
 app.use(errorHandler);
 
