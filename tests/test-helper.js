@@ -10,6 +10,11 @@ const initialNotes = [
   },
 ];
 
+const initialUser = {
+  username: "root",
+  password: "sekret",
+};
+
 async function getNonExistingNoteId() {
   const note = new Note({
     content: "willremovesoon",
@@ -34,6 +39,7 @@ async function getAllUsers() {
 
 module.exports = {
   initialNotes,
+  initialUser,
   getNonExistingNoteId,
   getAllNotes,
   getAllUsers,

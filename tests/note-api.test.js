@@ -6,6 +6,7 @@ const Note = require("../models/note");
 const User = require("../models/user");
 const {
   initialNotes,
+  initialUser,
   getNonExistingNoteId,
   getAllNotes,
   getAllUsers,
@@ -14,9 +15,14 @@ const {
 const api = supertest(app);
 
 beforeEach(async () => {
+  await User.deleteMany();
+  const passwordHash = await bcrypt.hash(initialUser.password, 10);
+  const user = new User({ username: initialUser.username, passwordHash });
+  await user.save();
+
   await Note.deleteMany();
   for (const note of initialNotes) {
-    const noteObject = new Note(note);
+    const noteObject = new Note({ ...note, user: user._id });
     await noteObject.save();
   }
 });
@@ -66,11 +72,21 @@ describe("when there is initially some notes saved", () => {
 
 describe("addition of a new note", () => {
   test("succeeds with valid data", async () => {
+    const usersAtStart = await getAllUsers();
+    const existingUser = usersAtStart[0];
+    const loginRes = await api
+      .post("/api/login")
+      .send({ username: existingUser.username, password: "sekret" });
+    const { token } = loginRes.body;
     const validNote = {
       content: "HTML is nice, but React is better!",
       date: new Date(),
+      user: existingUser.id,
     };
-    const res = await api.post("/api/notes").send(validNote);
+    const res = await api
+      .post("/api/notes")
+      .send(validNote)
+      .set("authorization", `Bearer ${token}`);
     expect(res.statusCode).toBe(201);
     expect(res.get("Content-Type")).toMatch(/application\/json/);
     const notesAtEnd = await getAllNotes();
@@ -80,8 +96,17 @@ describe("addition of a new note", () => {
   });
 
   test("fails with statuscode 400 if data is invalid", async () => {
-    const invalidNote = { date: new Date() };
-    const res = await api.post("/api/notes").send(invalidNote);
+    const usersAtStart = await getAllUsers();
+    const existingUser = usersAtStart[0];
+    const loginRes = await api
+      .post("/api/login")
+      .send({ username: existingUser.username, password: "sekret" });
+    const { token } = loginRes.body;
+    const invalidNote = { date: new Date(), user: existingUser.id };
+    const res = await api
+      .post("/api/notes")
+      .send(invalidNote)
+      .set("authorization", `Bearer ${token}`);
     expect(res.statusCode).toBe(400);
     const notesAtEnd = await getAllNotes();
     expect(notesAtEnd).toHaveLength(initialNotes.length);
@@ -140,7 +165,6 @@ describe("when there is initially one user in db", () => {
 
     test("fails with statuscode 400 if username already exists", async () => {
       const usersAtStart = await getAllUsers();
-      console.log(usersAtStart);
       const existingUser = usersAtStart[0];
       const invalidUser = {
         username: existingUser.username,
