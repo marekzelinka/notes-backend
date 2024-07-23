@@ -8,31 +8,6 @@ const MONGODB_URI = process.env.MONGODB_URI
 
 let app = express()
 
-let notes = [
-  {
-    id: '1',
-    content: 'HTML is easy',
-    important: true,
-  },
-  {
-    id: '2',
-    content: 'Browser can execute only JavaScript',
-    important: false,
-  },
-  {
-    id: '3',
-    content: 'GET and POST are the most important methods of HTTP protocol',
-    important: true,
-  },
-]
-
-function generateNoteId() {
-  let maxId = notes.length
-    ? Math.max(...notes.map((note) => Number(note.id)))
-    : 0
-  return String(maxId + 1)
-}
-
 run().catch(console.dir)
 
 async function run() {
@@ -56,9 +31,9 @@ async function run() {
     res.json(notes)
   })
 
-  app.get('/api/notes/:id', (req, res) => {
-    let id = req.params.id
-    let note = notes.find((note) => note.id === id)
+  app.get('/api/notes/:id', async (req, res) => {
+    let noteId = req.params.id
+    let note = await Note.findById(noteId)
 
     if (!note) {
       return res.status(404).end()
@@ -67,26 +42,26 @@ async function run() {
     res.json(note)
   })
 
-  app.delete('/api/notes/:id', (req, res) => {
-    let id = req.params.id
-    notes = notes.filter((note) => note.id !== id)
+  app.delete('/api/notes/:id', async (req, res) => {
+    let noteId = req.params.id
+    await Note.findByIdAndDelete(noteId)
     res.status(204).end()
   })
 
-  app.post('/api/notes', (req, res) => {
+  app.post('/api/notes', async (req, res) => {
     let { content, important } = req.body
 
     if (!content) {
       return res.status(400).json({ error: 'content missing' })
     }
 
-    let note = {
+    let note = new Note({
       content,
       important: Boolean(important) || false,
-      id: generateNoteId(),
-    }
-    notes = notes.concat(note)
-    res.status(201).json(note)
+    })
+    let savedNote = await note.save()
+
+    res.status(201).json(savedNote)
   })
 
   app.use(unknownEndpoint)
