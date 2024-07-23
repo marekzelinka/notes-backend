@@ -4,10 +4,18 @@ GET http://localhost:3000
 GET http://localhost:3000/api/notes
 
 ### Get single note
-GET http://localhost:3000/api/notes/1
+GET http://localhost:3000/api/notes/4
 
 ### Get single nonexisting note
 GET http://localhost:3000/api/notes/nonexistingid
 
 ### Delete note
 DELETE http://localhost:3000/api/notes/1
+
+### Create note
+POST http://localhost:3000/api/notes
+Content-Type: application/json
+
+{
+  "content": "node.js is also cool"
+}
