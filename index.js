@@ -1,4 +1,4 @@
-import http from 'node:http'
+import express from 'express'
 
 const PORT = 3000
 
@@ -20,9 +20,11 @@ let notes = [
   },
 ]
 
-let app = http.createServer((_request, response) => {
-  response.writeHead(200, { 'content-type': 'application/json' })
-  response.end(JSON.stringify(notes))
-})
-
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
+express()
+  .get('/', (_req, res) => {
+    res.send('<h1>Hello World!</h1>')
+  })
+  .get('/api/notes', (_req, res) => {
+    res.json(notes)
+  })
+  .listen(PORT, () => console.log(`Server running on port ${PORT}`))
