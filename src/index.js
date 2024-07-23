@@ -29,7 +29,7 @@ async function run() {
   app.get('/api/notes', async (_req, res, next) => {
     try {
       const notes = await Note.find()
-      res.json(notes)
+      res.send(notes)
     } catch (error) {
       next(error)
     }
@@ -44,7 +44,7 @@ async function run() {
         return res.status(404).end()
       }
 
-      res.json(note)
+      res.send(note)
     } catch (error) {
       next(error)
     }
@@ -65,17 +65,13 @@ async function run() {
     try {
       const { content, important } = req.body
 
-      if (!content) {
-        return res.status(400).json({ error: 'content missing' })
-      }
-
       const note = new Note({
         content,
-        important: Boolean(important) || false,
+        important: Boolean(important),
       })
       const savedNote = await note.save()
 
-      res.status(201).json(savedNote)
+      res.status(201).send(savedNote)
     } catch (error) {
       next(error)
     }
@@ -86,10 +82,6 @@ async function run() {
       const id = req.params.id
       const { content, important } = req.body
 
-      if (!content) {
-        return res.status(400).json({ error: 'content missing' })
-      }
-
       const updatedNote = await Note.findByIdAndUpdate(
         id,
         {
@@ -98,10 +90,12 @@ async function run() {
         },
         {
           new: true,
+          runValidators: true,
+          context: 'query',
         },
       )
 
-      res.json(updatedNote)
+      res.send(updatedNote)
     } catch (error) {
       next(error)
     }
@@ -123,7 +117,7 @@ function requestLogger(req, _res, next) {
 }
 
 function unknownEndpoint(_req, res) {
-  res.status(404).json({ error: 'unknown endpoint' })
+  res.status(404).send({ error: 'unknown endpoint' })
 }
 
 function errorHandler(error, _req, res, next) {
@@ -131,6 +125,8 @@ function errorHandler(error, _req, res, next) {
 
   if (error.name === 'CastError') {
     return res.status(400).send({ error: 'malformatted id' })
+  } else if (error.name === 'ValidationError') {
+    return res.status(400).send({ error: error.message })
   }
 
   next(error)
