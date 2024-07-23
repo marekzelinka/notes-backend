@@ -37,4 +37,9 @@ express()
 
     res.json(note)
   })
+  .delete('/api/notes/:id', (req, res) => {
+    let id = req.params.id
+    notes = notes.filter((note) => note.id !== id)
+    res.status(204).end()
+  })
   .listen(PORT, () => console.log(`Server running on port ${PORT}`))
