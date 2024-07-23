@@ -1,7 +1,11 @@
 import cors from 'cors'
 import express from 'express'
+import mongoose from 'mongoose'
 
-const PORT = process.env.PORT ?? 3000
+const PORT = process.env.PORT
+const MONGODB_URI = process.env.MONGODB_URI
+
+let app = express()
 
 let notes = [
   {
@@ -28,17 +32,44 @@ function generateNoteId() {
   return String(maxId + 1)
 }
 
-express()
-  .use(express.json())
-  .use(requestLogger)
-  .use(cors())
-  .get('/', (_req, res) => {
+run().catch(console.dir)
+
+async function run() {
+  let clientOptions = {
+    serverApi: { version: '1', strict: true, deprecationErrors: true },
+  }
+  await mongoose.connect(MONGODB_URI, clientOptions)
+  await mongoose.connection.db.admin().command({ ping: 1 })
+  console.log('Pinged your deployment. You successfully connected to MongoDB!')
+
+  let noteSchema = new mongoose.Schema({
+    content: String,
+    important: Boolean,
+  })
+  noteSchema.set('toJSON', {
+    transform: (_doc, ret) => {
+      ret.id = ret._id.toString()
+      delete ret._id
+      delete ret.__v
+    },
+  })
+
+  let Note = mongoose.model('Note', noteSchema)
+
+  app.use(express.json())
+  app.use(requestLogger)
+  app.use(cors())
+
+  app.get('/', (_req, res) => {
     res.send('<h1>Hello World!</h1>')
   })
-  .get('/api/notes', (_req, res) => {
+
+  app.get('/api/notes', async (_req, res) => {
+    let notes = await Note.find()
     res.json(notes)
   })
-  .get('/api/notes/:id', (req, res) => {
+
+  app.get('/api/notes/:id', (req, res) => {
     let id = req.params.id
     let note = notes.find((note) => note.id === id)
 
@@ -48,12 +79,14 @@ express()
 
     res.json(note)
   })
-  .delete('/api/notes/:id', (req, res) => {
+
+  app.delete('/api/notes/:id', (req, res) => {
     let id = req.params.id
     notes = notes.filter((note) => note.id !== id)
     res.status(204).end()
   })
-  .post('/api/notes', (req, res) => {
+
+  app.post('/api/notes', (req, res) => {
     let { content, important } = req.body
 
     if (!content) {
@@ -68,8 +101,11 @@ express()
     notes = notes.concat(note)
     res.status(201).json(note)
   })
-  .use(unknownEndpoint)
-  .listen(PORT, () => console.log(`Server running on port ${PORT}`))
+
+  app.use(unknownEndpoint)
+
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
+}
 
 function requestLogger(req, _res, next) {
   console.log('Method:', req.method)
