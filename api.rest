@@ -1,0 +1,13 @@
+GET http://localhost:3000
+
+### Get all notes
+GET http://localhost:3000/api/notes
+
+### Get single note
+GET http://localhost:3000/api/notes/1
+
+### Get single nonexisting note
+GET http://localhost:3000/api/notes/nonexistingid
+
+### Delete note
+DELETE http://localhost:3000/api/notes/1
