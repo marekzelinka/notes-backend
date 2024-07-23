@@ -31,7 +31,7 @@ async function run() {
     res.json(notes)
   })
 
-  app.get('/api/notes/:id', async (req, res) => {
+  app.get('/api/notes/:id', async (req, res, next) => {
     try {
       let noteId = req.params.id
       let note = await Note.findById(noteId)
@@ -42,8 +42,7 @@ async function run() {
 
       res.json(note)
     } catch (error) {
-      console.error(error)
-      res.status(400).json({ error: 'malformatted id' })
+      next(error)
     }
   })
 
@@ -70,6 +69,8 @@ async function run() {
   })
 
   app.use(unknownEndpoint)
+  // errorHandler needs to be the last loaded middleware
+  app.use(errorHandler)
 
   app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
 }
@@ -84,4 +85,14 @@ function requestLogger(req, _res, next) {
 
 function unknownEndpoint(_req, res) {
   res.status(404).json({ error: 'unknown endpoint' })
+}
+
+function errorHandler(error, _req, res, next) {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return res.status(400).send({ error: 'malformatted id' })
+  }
+
+  next(error)
 }
