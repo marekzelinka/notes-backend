@@ -20,5 +20,14 @@ Content-Type: application/json
   "content": "node.js is also cool"
 }
 
+### Update note
+PUT http://localhost:3000/api/notes/669fad878eab5fa0dcdfd8d0
+Content-Type: application/json
+
+{
+  "content": "React is cool",
+  "important": true
+}
+
 ### Test unknown endpoint
 GET http://localhost:3000/not/found

@@ -26,15 +26,19 @@ async function run() {
     res.send('<h1>Hello World!</h1>')
   })
 
-  app.get('/api/notes', async (_req, res) => {
-    const notes = await Note.find()
-    res.json(notes)
+  app.get('/api/notes', async (_req, res, next) => {
+    try {
+      const notes = await Note.find()
+      res.json(notes)
+    } catch (error) {
+      next(error)
+    }
   })
 
   app.get('/api/notes/:id', async (req, res, next) => {
     try {
-      const noteId = req.params.id
-      const note = await Note.findById(noteId)
+      const id = req.params.id
+      const note = await Note.findById(id)
 
       if (!note) {
         return res.status(404).end()
@@ -46,27 +50,58 @@ async function run() {
     }
   })
 
-  app.delete('/api/notes/:id', async (req, res) => {
-    const noteId = req.params.id
-    await Note.findByIdAndDelete(noteId)
+  app.delete('/api/notes/:id', async (req, res, next) => {
+    try {
+      const id = req.params.id
+      await Note.findByIdAndDelete(id)
 
-    res.status(204).end()
+      res.status(204).end()
+    } catch (error) {
+      next(error)
+    }
   })
 
-  app.post('/api/notes', async (req, res) => {
-    const { content, important } = req.body
+  app.post('/api/notes', async (req, res, next) => {
+    try {
+      const { content, important } = req.body
 
-    if (!content) {
-      return res.status(400).json({ error: 'content missing' })
+      if (!content) {
+        return res.status(400).json({ error: 'content missing' })
+      }
+
+      const note = new Note({
+        content,
+        important: Boolean(important) || false,
+      })
+      const savedNote = await note.save()
+
+      res.status(201).json(savedNote)
+    } catch (error) {
+      next(error)
     }
+  })
 
-    const note = new Note({
-      content,
-      important: Boolean(important) || false,
-    })
-    const savedNote = await note.save()
+  app.put('/api/notes/:id', async (req, res, next) => {
+    try {
+      const id = req.params.id
+      const { content, important } = req.body
 
-    res.status(201).json(savedNote)
+      if (!content) {
+        return res.status(400).json({ error: 'content missing' })
+      }
+
+      const updates = {
+        content,
+        important: Boolean(important) || false,
+      }
+      const updatedNote = await Note.findByIdAndUpdate(id, updates, {
+        new: true,
+      })
+
+      res.json(updatedNote)
+    } catch (error) {
+      next(error)
+    }
   })
 
   app.use(unknownEndpoint)
