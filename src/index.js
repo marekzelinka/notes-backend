@@ -90,13 +90,16 @@ async function run() {
         return res.status(400).json({ error: 'content missing' })
       }
 
-      const updates = {
-        content,
-        important: Boolean(important) || false,
-      }
-      const updatedNote = await Note.findByIdAndUpdate(id, updates, {
-        new: true,
-      })
+      const updatedNote = await Note.findByIdAndUpdate(
+        id,
+        {
+          content,
+          important: Boolean(important) || false,
+        },
+        {
+          new: true,
+        },
+      )
 
       res.json(updatedNote)
     } catch (error) {
