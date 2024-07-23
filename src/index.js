@@ -32,14 +32,19 @@ async function run() {
   })
 
   app.get('/api/notes/:id', async (req, res) => {
-    let noteId = req.params.id
-    let note = await Note.findById(noteId)
+    try {
+      let noteId = req.params.id
+      let note = await Note.findById(noteId)
 
-    if (!note) {
-      return res.status(404).end()
+      if (!note) {
+        return res.status(404).end()
+      }
+
+      res.json(note)
+    } catch (error) {
+      console.error(error)
+      res.status(400).json({ error: 'malformatted id' })
     }
-
-    res.json(note)
   })
 
   app.delete('/api/notes/:id', async (req, res) => {
