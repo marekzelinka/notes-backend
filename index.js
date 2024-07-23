@@ -27,4 +27,14 @@ express()
   .get('/api/notes', (_req, res) => {
     res.json(notes)
   })
+  .get('/api/notes/:id', (req, res) => {
+    let id = req.params.id
+    let note = notes.find((note) => note.id === id)
+
+    if (!note) {
+      return res.status(404).end()
+    }
+
+    res.json(note)
+  })
   .listen(PORT, () => console.log(`Server running on port ${PORT}`))
