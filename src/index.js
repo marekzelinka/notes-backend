@@ -1,6 +1,7 @@
+import cors from 'cors'
 import express from 'express'
 
-const PORT = 3000
+const PORT = process.env.PORT ?? 3000
 
 let notes = [
   {
@@ -30,6 +31,7 @@ function generateNoteId() {
 express()
   .use(express.json())
   .use(requestLogger)
+  .use(cors())
   .get('/', (_req, res) => {
     res.send('<h1>Hello World!</h1>')
   })
