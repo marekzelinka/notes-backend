@@ -6,12 +6,12 @@ import { Note } from './models/note.js'
 const PORT = process.env.PORT
 const MONGODB_URI = process.env.MONGODB_URI
 
-let app = express()
+const app = express()
 
 run().catch(console.dir)
 
 async function run() {
-  let clientOptions = {
+  const clientOptions = {
     serverApi: { version: '1', strict: true, deprecationErrors: true },
   }
   await mongoose.connect(MONGODB_URI, clientOptions)
@@ -27,14 +27,14 @@ async function run() {
   })
 
   app.get('/api/notes', async (_req, res) => {
-    let notes = await Note.find()
+    const notes = await Note.find()
     res.json(notes)
   })
 
   app.get('/api/notes/:id', async (req, res, next) => {
     try {
-      let noteId = req.params.id
-      let note = await Note.findById(noteId)
+      const noteId = req.params.id
+      const note = await Note.findById(noteId)
 
       if (!note) {
         return res.status(404).end()
@@ -47,23 +47,24 @@ async function run() {
   })
 
   app.delete('/api/notes/:id', async (req, res) => {
-    let noteId = req.params.id
+    const noteId = req.params.id
     await Note.findByIdAndDelete(noteId)
+
     res.status(204).end()
   })
 
   app.post('/api/notes', async (req, res) => {
-    let { content, important } = req.body
+    const { content, important } = req.body
 
     if (!content) {
       return res.status(400).json({ error: 'content missing' })
     }
 
-    let note = new Note({
+    const note = new Note({
       content,
       important: Boolean(important) || false,
     })
-    let savedNote = await note.save()
+    const savedNote = await note.save()
 
     res.status(201).json(savedNote)
   })
