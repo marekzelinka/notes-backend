@@ -29,6 +29,7 @@ function generateNoteId() {
 
 express()
   .use(express.json())
+  .use(requestLogger)
   .get('/', (_req, res) => {
     res.send('<h1>Hello World!</h1>')
   })
@@ -65,4 +66,17 @@ express()
     notes = notes.concat(note)
     res.status(201).json(note)
   })
+  .use(unknownEndpoint)
   .listen(PORT, () => console.log(`Server running on port ${PORT}`))
+
+function requestLogger(req, _res, next) {
+  console.log('Method:', req.method)
+  console.log('Path:  ', req.path)
+  console.log('Body:  ', req.body)
+  console.log('---')
+  next()
+}
+
+function unknownEndpoint(_req, res) {
+  res.status(404).json({ error: 'unknown endpoint' })
+}
