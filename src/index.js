@@ -1,6 +1,7 @@
 import cors from 'cors'
 import express from 'express'
 import mongoose from 'mongoose'
+import { Note } from './models/note.js'
 
 const PORT = process.env.PORT
 const MONGODB_URI = process.env.MONGODB_URI
@@ -41,20 +42,6 @@ async function run() {
   await mongoose.connect(MONGODB_URI, clientOptions)
   await mongoose.connection.db.admin().command({ ping: 1 })
   console.log('Pinged your deployment. You successfully connected to MongoDB!')
-
-  let noteSchema = new mongoose.Schema({
-    content: String,
-    important: Boolean,
-  })
-  noteSchema.set('toJSON', {
-    transform: (_doc, ret) => {
-      ret.id = ret._id.toString()
-      delete ret._id
-      delete ret.__v
-    },
-  })
-
-  let Note = mongoose.model('Note', noteSchema)
 
   app.use(express.json())
   app.use(requestLogger)
