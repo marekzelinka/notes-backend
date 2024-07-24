@@ -9,10 +9,10 @@ const noteSchema = new mongoose.Schema({
   important: { type: Boolean, default: false },
 })
 noteSchema.set('toJSON', {
+  virtuals: true,
+  versionKey: false,
   transform: (_doc, ret) => {
-    ret.id = ret._id.toString()
     delete ret._id
-    delete ret.__v
   },
 })
 

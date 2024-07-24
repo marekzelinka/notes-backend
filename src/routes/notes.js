@@ -9,7 +9,7 @@ notesRouter.post('', async (req, res, next) => {
 
     const note = new Note({
       content,
-      important: Boolean(important),
+      important,
     })
     const savedNote = await note.save()
 
