@@ -9,6 +9,9 @@ GET http://localhost:3000/api/notes/669fad878eab5fa0dcdfd8d0
 ### Get single nonexisting note
 GET http://localhost:3000/api/notes/669fb91dd2a9ba472da74ee7
 
+### Try to get single note with invalid id
+GET http://localhost:3000/api/notes/1
+
 ### Delete note
 DELETE http://localhost:3000/api/notes/669fab9669330fe1799ecd72
 
