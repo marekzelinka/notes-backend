@@ -7,7 +7,7 @@
     "start": "cross-env NODE_ENV=production node src/index.js",
     "dev": "cross-env NODE_ENV=development node --watch --env-file=.env src/index.js",
     "lint": "eslint src",
-    "test": "cross-env NODE_ENV=test node --test --watch",
+    "test": "cross-env NODE_ENV=test node --test --watch --env-file=.env",
     "format": "prettier . -w"
   },
   "devDependencies": {
@@ -16,7 +16,8 @@
     "eslint": "^9.7.0",
     "globals": "^15.8.0",
     "prettier": "^3.3.3",
-    "prettier-plugin-organize-imports": "^4.0.0"
+    "prettier-plugin-organize-imports": "^4.0.0",
+    "supertest": "^7.0.0"
   },
   "dependencies": {
     "cors": "^2.8.5",
