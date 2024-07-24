@@ -1,4 +1,4 @@
-import { env } from './env'
+import { env } from './env.js'
 
 export function logInfo(...params) {
   if (env.NODE_ENV === 'test') {
