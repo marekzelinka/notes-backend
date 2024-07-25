@@ -11,7 +11,7 @@ export const initialNotes = [
   },
 ]
 
-export async function getNonExistingId() {
+export async function getNonexistingValidNoteId() {
   const note = new Note({ content: 'willremovethissoon' })
   await note.save()
   await note.deleteOne()

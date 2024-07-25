@@ -1,6 +1,6 @@
 import assert from 'node:assert'
 import { describe, test } from 'node:test'
-import { average, reverse } from './test-demo.js'
+import { average, reverse } from '../src/utils/testing-demo.js'
 
 describe('reverse', () => {
   test('reverse of a', () => {
