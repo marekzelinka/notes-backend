@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import { User } from './user.js'
 
 const noteSchema = new mongoose.Schema({
   content: {
@@ -7,6 +8,10 @@ const noteSchema = new mongoose.Schema({
     required: true,
   },
   important: { type: Boolean, default: false },
+  user: {
+    type: mongoose.Types.ObjectId,
+    ref: User,
+  },
 })
 noteSchema.set('toJSON', {
   virtuals: true,
