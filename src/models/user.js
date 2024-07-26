@@ -1,14 +1,22 @@
 import mongoose from 'mongoose'
-import { Note } from './note.js'
 
 const userSchema = new mongoose.Schema({
-  username: String,
+  username: {
+    type: String,
+    required: [true, 'Username is required'],
+    unique: true,
+    minLength: [3, 'Username is too short'],
+    validate: {
+      validator: validateUsernmae,
+      message: 'Username is not valid',
+    },
+  },
   name: String,
   passwordHash: String,
   notes: [
     {
-      type: mongoose.Types.ObjectId,
-      ref: Note,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Note',
     },
   ],
 })
@@ -23,3 +31,17 @@ userSchema.set('toJSON', {
 })
 
 export const User = mongoose.model('User', userSchema)
+
+function validateUsernmae(username) {
+  return (
+    /^[a-z._]+$/i.test(username) &&
+    !username.startsWith('.') &&
+    !username.startsWith('_') &&
+    !username.endsWith('.') &&
+    !username.endsWith('_') &&
+    !username.includes('..') &&
+    !username.includes('__') &&
+    !username.includes('._') &&
+    !username.includes('_.')
+  )
+}

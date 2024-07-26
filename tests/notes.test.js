@@ -4,11 +4,17 @@ import { after, beforeEach, describe, test } from 'node:test'
 import supertest from 'supertest'
 import { app } from '../src/app.js'
 import { Note } from '../src/models/note.js'
-import {
-  getNonexistingValidNoteId,
-  getSavedNotes,
-  initialNotes,
-} from './note-test-utils.js'
+
+const initialNotes = [
+  {
+    content: 'HTML is easy',
+    important: false,
+  },
+  {
+    content: 'Browser can execute only JavaScript',
+    important: true,
+  },
+]
 
 const api = supertest(app)
 
@@ -37,7 +43,7 @@ describe('when there are initially some notes saved', () => {
 
   describe('viewing a specific note', () => {
     test('suceeds with status code of 200 if id is valid', async () => {
-      const notesBefore = await getSavedNotes()
+      const notesBefore = await getStoredNotes()
       const noteToView = notesBefore[0]
 
       const res = await api.get(`/api/notes/${noteToView.id}`)
@@ -47,8 +53,7 @@ describe('when there are initially some notes saved', () => {
     })
 
     test('fails with status code of 404 if note is not found', async () => {
-      const validId = await getNonexistingValidNoteId()
-
+      const validId = await getNonExistingValidNoteId()
       const res = await api.get(`/api/notes/${validId}`)
       assert.strictEqual(res.status, 404)
     })
@@ -64,47 +69,59 @@ describe('when there are initially some notes saved', () => {
 
   describe('addition of a new note', () => {
     test('succeeds with status code of 201 if data is valid', async () => {
-      const validNoteObject = {
+      const validNote = {
         content: 'async/await simplifies making async calls',
       }
-
-      const res = await api.post('/api/notes').send(validNoteObject)
+      const res = await api.post('/api/notes').send(validNote)
       assert.strictEqual(res.status, 201)
       assert.match(res.get('Content-Type'), /application\/json/)
 
-      const notesAfter = await getSavedNotes()
+      const notesAfter = await getStoredNotes()
       assert.strictEqual(notesAfter.length, initialNotes.length + 1)
       const contents = notesAfter.map((note) => note.content)
-      assert(contents.includes(validNoteObject.content))
+      assert(contents.includes(validNote.content))
     })
 
     test('fails with status code of 400 if content is missing', async () => {
-      const invalidNoteObject = { important: true }
-
-      const res = await api.post('/api/notes').send(invalidNoteObject)
+      const invalidNote = { important: true }
+      const res = await api.post('/api/notes').send(invalidNote)
       assert.strictEqual(res.status, 400)
 
-      const notesAfter = await getSavedNotes()
+      const notesAfter = await getStoredNotes()
       assert.strictEqual(notesAfter.length, initialNotes.length)
     })
   })
 
   describe('deletion of a note', () => {
     test('succeeds with a status of 204 if id is valid', async () => {
-      const notesBefore = await getSavedNotes()
+      const notesBefore = await getStoredNotes()
       const noteToDelete = notesBefore[0]
 
       const res = await api.delete(`/api/notes/${noteToDelete.id}`)
       assert.strictEqual(res.status, 204)
 
-      const notesAfter = await getSavedNotes()
+      const notesAfter = await getStoredNotes()
       assert.strictEqual(notesAfter.length, initialNotes.length - 1)
       const contents = notesAfter.map((note) => note.content)
       assert(!contents.includes(noteToDelete.content))
     })
   })
+
+  after(async () => {
+    await mongoose.connection.close()
+  })
 })
 
-after(async () => {
-  await mongoose.connection.close()
-})
+async function getNonExistingValidNoteId() {
+  const note = new Note({ content: 'willremovethissoon' })
+  await note.save()
+  await note.deleteOne()
+
+  return note._id.toString()
+}
+
+async function getStoredNotes() {
+  const notes = await Note.find()
+
+  return notes.map((note) => note.toJSON())
+}

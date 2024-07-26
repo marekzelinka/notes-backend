@@ -19,6 +19,9 @@ export function errorHandler(error, _req, res, next) {
     return res.status(400).send({ error: 'malformatted id' })
   } else if (error.name === 'ValidationError') {
     return res.status(400).send({ error: error.message })
+  } else if (error.name === 'MongoServerError' && error.code === 11000) {
+    const property = Object.keys(error.keyValue)[0]
+    return res.status(400).send({ error: `${property} must be unique` })
   }
 
   next(error)

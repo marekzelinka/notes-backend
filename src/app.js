@@ -2,6 +2,7 @@ import cors from 'cors'
 import express from 'express'
 import 'express-async-errors'
 import { notesRouter } from './routes/notes.js'
+import { usersRouter } from './routes/users.js'
 import { connectDatabase } from './utils/db.js'
 import {
   errorHandler,
@@ -18,6 +19,7 @@ app.use(express.json())
 app.use(requestLogger)
 
 app.use('/api/notes', notesRouter)
+app.use('/api/users', usersRouter)
 
 app.use(unknownEndpoint)
 // errorHandler needs to be the last loaded middleware

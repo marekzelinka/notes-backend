@@ -1,16 +1,15 @@
 import mongoose from 'mongoose'
-import { User } from './user.js'
 
 const noteSchema = new mongoose.Schema({
   content: {
     type: String,
-    minLength: 5,
-    required: true,
+    minLength: [5, 'Content is too short'],
+    required: [true, 'Content is required'],
   },
   important: { type: Boolean, default: false },
   user: {
-    type: mongoose.Types.ObjectId,
-    ref: User,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
   },
 })
 noteSchema.set('toJSON', {
