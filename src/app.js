@@ -1,8 +1,8 @@
 import cors from 'cors'
 import express from 'express'
 import 'express-async-errors'
-import { notesRouter } from './routes/notes.js'
-import { usersRouter } from './routes/users.js'
+import { notesRouter } from './controllers/notes.js'
+import { usersRouter } from './controllers/users.js'
 import { connectDatabase } from './utils/db.js'
 import {
   errorHandler,

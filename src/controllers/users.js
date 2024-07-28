@@ -4,8 +4,8 @@ import { hashPassword } from '../utils/passwords.js'
 
 export const usersRouter = express.Router()
 
-usersRouter.post('/', async (req, res) => {
-  const { username, name, password } = req.body
+usersRouter.post('/', async (request, response) => {
+  const { username, name, password } = request.body
   const passwordHash = await hashPassword(password)
   const user = new User({
     username,
@@ -13,10 +13,10 @@ usersRouter.post('/', async (req, res) => {
     passwordHash,
   })
   const savedUser = await user.save()
-  res.status(201).send(savedUser)
+  response.status(201).send(savedUser)
 })
 
-usersRouter.get('/', async (_req, res) => {
+usersRouter.get('/', async (_request, response) => {
   const users = await User.find()
-  res.send(users)
+  response.send(users)
 })
