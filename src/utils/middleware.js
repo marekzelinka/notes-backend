@@ -20,8 +20,11 @@ export function errorHandler(error, _request, response, next) {
   } else if (error.name === 'ValidationError') {
     return response.status(400).send({ error: error.message })
   } else if (error.name === 'MongoServerError' && error.code === 11000) {
-    const property = Object.keys(error.keyValue)[0]
-    return response.status(400).send({ error: `${property} must be unique` })
+    const prop = Object.keys(error.keyValue)[0]
+    const formattedProp = prop[0].toUpperCase() + prop.slice(1)
+    return response
+      .status(400)
+      .send({ error: `${formattedProp} must be unique` })
   }
 
   next(error)
