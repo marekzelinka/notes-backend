@@ -3,7 +3,7 @@ import { Note } from '../models/note.js'
 
 export const notesRouter = express.Router()
 
-notesRouter.post('', async (request, response) => {
+notesRouter.post('/', async (request, response) => {
   const { content, important } = request.body
   const note = new Note({
     content,
