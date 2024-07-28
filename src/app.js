@@ -22,5 +22,5 @@ app.use('/api/notes', notesRouter)
 app.use('/api/users', usersRouter)
 
 app.use(unknownEndpoint)
-// errorHandler needs to be the last loaded middleware
+// errorHandler should be the last loaded middleware
 app.use(errorHandler)
