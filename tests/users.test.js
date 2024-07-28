@@ -47,7 +47,8 @@ describe('when there is initially one user saved', () => {
     test('fails with status code of 400 if username is taken', async () => {
       const usersBefore = await getInitialUsersFromDb()
 
-      // Username is not unique
+      // Username is not unique here, beacuse a user is created with the same
+      // one at the beginning of the test suite
       const invalidUser = {
         username: 'root',
         password: '123456',
