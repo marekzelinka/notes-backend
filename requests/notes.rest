@@ -4,7 +4,7 @@ GET http://localhost:3000
 GET http://localhost:3000/api/notes
 
 ### Get single note
-GET http://localhost:3000/api/notes/669fad878eab5fa0dcdfd8d0
+GET http://localhost:3000/api/notes/66acebd05616cd15dbefe3fe
 
 ### Get single nonexisting note
 GET http://localhost:3000/api/notes/669fb91dd2a9ba472da74ee7
@@ -18,10 +18,11 @@ DELETE http://localhost:3000/api/notes/669fab9669330fe1799ecd72
 ### Create note
 POST http://localhost:3000/api/notes
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im16ZWxpbmthIiwiaWQiOiI2NmEzYTQ2OWFjMWM3YjFmYzlmN2I2OTciLCJpYXQiOjE3MjI2MDg1NDR9.LYYkJTYOAwO4PKAIq9WOo38cpeKKxcdbHJtRp3MFN-s
 
 {
-  "userId": "66a3a469ac1c7b1fc9f7b697",
-  "content": "The existing code and test need to be changed when user id added to system"
+  "content": "Single page apps use token based auth",
+  "important": false
 }
 
 ### Update note

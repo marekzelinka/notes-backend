@@ -22,9 +22,14 @@ export function errorHandler(error, _request, response, next) {
   } else if (error.name === 'MongoServerError' && error.code === 11000) {
     const prop = Object.keys(error.keyValue)[0]
     const formattedProp = prop[0].toUpperCase() + prop.slice(1)
+
     return response
       .status(400)
       .send({ error: `${formattedProp} must be unique` })
+  } else if (error.name === 'JsonWebTokenError') {
+    return response.status(401).send({
+      error: 'token invalid',
+    })
   }
 
   next(error)

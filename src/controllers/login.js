@@ -1,8 +1,8 @@
-import * as bcrypt from 'bcrypt'
 import express from 'express'
 import jwt from 'jsonwebtoken'
 import { User } from '../models/user.js'
 import { env } from '../utils/env.js'
+import { validatePassword } from '../utils/passwords.js'
 
 export const loginRouter = express.Router()
 
@@ -13,7 +13,7 @@ loginRouter.post('/', async (request, response) => {
 
   const passwordCorrect = !user?.passwordHash
     ? false
-    : await bcrypt.compare(plaintextPassword, user.passwordHash)
+    : await validatePassword(plaintextPassword, user.passwordHash)
   if (!passwordCorrect) {
     return response.status(401).json({
       error: 'invalid username or password',
