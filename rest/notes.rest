@@ -20,7 +20,8 @@ POST http://localhost:3000/api/notes
 Content-Type: application/json
 
 {
-  "content": "express.js is also cool?!"
+  "userId": "66a3a469ac1c7b1fc9f7b697",
+  "content": "The existing code and test need to be changed when user id added to system"
 }
 
 ### Update note
