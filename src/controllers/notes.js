@@ -23,7 +23,10 @@ notesRouter.post('/', async (request, response) => {
 })
 
 notesRouter.get('/', async (_request, response) => {
-  const notes = await Note.find()
+  const notes = await Note.find().populate('user', {
+    username: 1,
+    name: 1,
+  })
 
   response.send(notes)
 })
