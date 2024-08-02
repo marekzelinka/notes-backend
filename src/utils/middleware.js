@@ -30,6 +30,10 @@ export function errorHandler(error, _request, response, next) {
     return response.status(401).send({
       error: 'token invalid',
     })
+  } else if (error.name === 'TokenExpiredError') {
+    return response.status(401).send({
+      error: 'token expired',
+    })
   }
 
   next(error)
