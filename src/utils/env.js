@@ -9,4 +9,7 @@ invariant(PORT, 'Missing PORT env var')
 const MONGODB_URI = process.env.MONGODB_URI
 invariant(MONGODB_URI, 'Missing MONGODB_URI env var')
 
-export const env = { NODE_ENV, PORT, MONGODB_URI }
+const SECRET = process.env.SECRET
+invariant(SECRET, 'Missing SECRET env var')
+
+export const env = { NODE_ENV, PORT, MONGODB_URI, SECRET }
