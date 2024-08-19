@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "cross-env NODE_ENV=production node src/index.js",
+    "start:test": "cross-env NODE_ENV=test node --env-file=.env --env-file=.env.local src/index.js",
     "dev": "cross-env NODE_ENV=development node --watch --env-file=.env --env-file=.env.local src/index.js",
     "lint": "eslint src",
     "test": "cross-env NODE_ENV=test node --test --env-file=.env --env-file=.env.test.local",
